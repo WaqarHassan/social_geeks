@@ -1,0 +1,7 @@
+npm i concurrently      // install this to run node server and react client 
+npm i --save 
+npm i react-app client  //  creat and configure react client app
+npm run server          // run node server
+npm upgrade node        // upgrade node
+npm i -g npm            // to upgrade npm
+npm install prettier --save-dev  
