@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-// import axios from "axios";
 import PropTypes from "prop-types";
+import { withRouter } from "react-router-dom";
 import classnames from "classnames";
 import { connect } from "react-redux";
 import { registerUser } from "../../actions/authActions";
@@ -21,6 +21,11 @@ class Register extends Component {
     this.onSubmit = this.onSubmit.bind(this);
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.errors) {
+      this.setState({ errors: nextProps.errors });
+    }
+  }
   onChange(e) {
     this.setState({ [e.target.name]: e.target.value });
   }
@@ -36,20 +41,13 @@ class Register extends Component {
 
     // console.log(newUser);
 
-    this.props.registerUser(newUser); //ANy action that we bring in will be called by props
-    // axios
-    //   .post("/api/users/register", newUser)
-    //   .then(res => console.log(res.data))
-    //   .catch(err => this.setState({ errors: err.response.data }));
+    this.props.registerUser(newUser, this.props.history); //ANy action that we bring in will be called by props
   }
   render() {
     const { errors } = this.state;
 
-    const { user } = this.props.auth;
-
     return (
       <div className="register">
-        {user ? user.name : null}
         <div className="container">
           <div className="row">
             <div className="col-md-8 m-auto">
@@ -135,16 +133,18 @@ class Register extends Component {
 // In React, Any properties we have in our components , we need to map it to prop types
 Register.propTypes = {
   registerUser: PropTypes.func.isRequired,
-  auth: PropTypes.object.isRequired
+  auth: PropTypes.object.isRequired,
+  errors: PropTypes.object.errors
 };
 
 //to get any of auth states into the component
 const mapStateToProps = state => ({
-  auth: state.auth //Using this we'll have state.auth value into our this.props
+  auth: state.auth, //Using this we'll have state.auth value into our this.props
   //state.auth is coming from root reducer which in our case is in reducers/index.js
+  errors: state.errors
 });
 
 export default connect(
   mapStateToProps,
   { registerUser } // this is an object where we can map our actions
-)(Register);
+)(withRouter(Register));
