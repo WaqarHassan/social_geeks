@@ -1,6 +1,10 @@
 import React, { Component } from "react";
-import axios from "axios";
+// import axios from "axios";
+import PropTypes from "prop-types";
 import classnames from "classnames";
+import { connect } from "react-redux";
+import { registerUser } from "../../actions/authActions";
+// import { prototype } from "stream";
 
 class Register extends Component {
   constructor() {
@@ -30,17 +34,22 @@ class Register extends Component {
       password2: this.state.password2
     };
 
-    console.log(newUser);
+    // console.log(newUser);
 
-    axios
-      .post("/api/users/register", newUser)
-      .then(res => console.log(res.data))
-      .catch(err => this.setState({ errors: err.response.data }));
+    this.props.registerUser(newUser); //ANy action that we bring in will be called by props
+    // axios
+    //   .post("/api/users/register", newUser)
+    //   .then(res => console.log(res.data))
+    //   .catch(err => this.setState({ errors: err.response.data }));
   }
   render() {
     const { errors } = this.state;
+
+    const { user } = this.props.auth;
+
     return (
       <div className="register">
+        {user ? user.name : null}
         <div className="container">
           <div className="row">
             <div className="col-md-8 m-auto">
@@ -123,4 +132,19 @@ class Register extends Component {
   }
 }
 
-export default Register;
+// In React, Any properties we have in our components , we need to map it to prop types
+Register.propTypes = {
+  registerUser: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired
+};
+
+//to get any of auth states into the component
+const mapStateToProps = state => ({
+  auth: state.auth //Using this we'll have state.auth value into our this.props
+  //state.auth is coming from root reducer which in our case is in reducers/index.js
+});
+
+export default connect(
+  mapStateToProps,
+  { registerUser } // this is an object where we can map our actions
+)(Register);
