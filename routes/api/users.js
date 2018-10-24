@@ -8,8 +8,8 @@ const keys = require("../../config/keys");
 const User = require("../../models/User");
 const passport = require("passport");
 
-const ValidateRegisterInput = require('../../validation/register');
-const ValidateLoginInput = require('../../validation/login');
+const ValidateRegisterInput = require("../../validation/register");
+const ValidateLoginInput = require("../../validation/login");
 
 // @route  GET api/users/test
 // @desc   Tests users route
@@ -20,19 +20,17 @@ router.get("/test", (req, res) => res.json({ msg: "Users Works" }));
 // @desc   Register users
 // @access Public
 router.post("/register", (req, res) => {
+  const { errors, isValid } = ValidateRegisterInput(req.body);
 
-  const {errors , isValid } = ValidateRegisterInput(req.body)
-
-    //Check Validation
-    if(!isValid) {
-        return res.status(400).json(errors);
-    }
+  //Check Validation
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
 
   User.findOne({ email: req.body.email }).then(user => {
     if (user) {
-
-      errors.email = "Email already exists"
-      return res.status(400).json({errors});
+      errors.email = "Email already exists";
+      return res.status(400).json({ errors });
     } else {
       const avatar = gravatar.url(req.body.email, {
         s: "300", //Size
@@ -64,13 +62,12 @@ router.post("/register", (req, res) => {
 // @desc   Login User / Return JWT Token
 // @access Public
 router.post("/login", (req, res) => {
+  const { errors, isValid } = ValidateLoginInput(req.body);
 
-    const {errors , isValid } = ValidateLoginInput(req.body)
-
-    //Check Validation
-    if(!isValid) {
-        return res.status(400).json(errors);
-    }
+  //Check Validation
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
 
   const email = req.body.email;
   const password = req.body.password;
@@ -79,8 +76,8 @@ router.post("/login", (req, res) => {
   User.findOne({ email: email }).then(user => {
     //ccheck for user
     if (!user) {
-      errors.email = "User not Found"
-      return res.status(400).json({ errors });
+      errors.email = "User not Found";
+      return res.status(400).json(errors);
     }
     // Check password
     bcrypt.compare(password, user.password).then(isMatch => {
@@ -100,8 +97,8 @@ router.post("/login", (req, res) => {
         );
         //res.json({ msg: "Success" });
       } else {
-        errors.password = "Password Incorrect"
-          return res.status(400).json({ errors });
+        errors.password = "Password Incorrect";
+        return res.status(400).json(errors);
       }
     });
   });

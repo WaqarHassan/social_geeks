@@ -4,7 +4,6 @@ import { withRouter } from "react-router-dom";
 import classnames from "classnames";
 import { connect } from "react-redux";
 import { registerUser } from "../../actions/authActions";
-// import { prototype } from "stream";
 
 class Register extends Component {
   constructor() {
@@ -21,14 +20,22 @@ class Register extends Component {
     this.onSubmit = this.onSubmit.bind(this);
   }
 
+  componentDidMount() {
+    if (this.props.auth.isAuthenticated) {
+      this.props.history.push("/dashboard");
+    }
+  }
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.errors) {
       this.setState({ errors: nextProps.errors });
     }
   }
+
   onChange(e) {
     this.setState({ [e.target.name]: e.target.value });
   }
+
   onSubmit(e) {
     e.preventDefault();
 
@@ -39,10 +46,9 @@ class Register extends Component {
       password2: this.state.password2
     };
 
-    // console.log(newUser);
-
-    this.props.registerUser(newUser, this.props.history); //ANy action that we bring in will be called by props
+    this.props.registerUser(newUser, this.props.history);
   }
+
   render() {
     const { errors } = this.state;
 
@@ -55,7 +61,7 @@ class Register extends Component {
               <p className="lead text-center">
                 Create your DevConnector account
               </p>
-              <form onSubmit={this.onSubmit}>
+              <form noValidate onSubmit={this.onSubmit}>
                 <div className="form-group">
                   <input
                     type="text"
@@ -130,21 +136,18 @@ class Register extends Component {
   }
 }
 
-// In React, Any properties we have in our components , we need to map it to prop types
 Register.propTypes = {
   registerUser: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
-  errors: PropTypes.object.errors
+  errors: PropTypes.object.isRequired
 };
 
-//to get any of auth states into the component
 const mapStateToProps = state => ({
-  auth: state.auth, //Using this we'll have state.auth value into our this.props
-  //state.auth is coming from root reducer which in our case is in reducers/index.js
+  auth: state.auth,
   errors: state.errors
 });
 
 export default connect(
   mapStateToProps,
-  { registerUser } // this is an object where we can map our actions
+  { registerUser }
 )(withRouter(Register));
